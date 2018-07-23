@@ -14,7 +14,7 @@ public class SharkActivity extends AppCompatActivity {
     }
 
     public void actionEntryToApp(View view) {
-        Intent i = new Intent(this, MainActivity.class);
-        startActivity(i);
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 }
