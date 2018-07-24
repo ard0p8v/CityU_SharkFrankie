@@ -1,9 +1,12 @@
-package com.sample.sharkfrankie;
+package com.sample.sharkfrankie.activities;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+
+import com.sample.sharkfrankie.R;
+import com.sample.sharkfrankie.activities.MainActivity;
 
 public class SharkActivity extends AppCompatActivity {
 
