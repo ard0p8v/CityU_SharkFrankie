@@ -27,6 +27,10 @@ public class BleDeviceListAdapter extends BaseAdapter {
         mInflater = LayoutInflater.from(this.context);
 
     }
+    public void clear() {
+        deviceArrayList.clear();
+    }
+
 
     @Override
     public int getCount() {
