@@ -1,4 +1,4 @@
-package com.sample.sharkfrankie.activities;
+package com.sample.sharkfrankie.utils;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -21,31 +21,21 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.sample.sharkfrankie.R;
-import com.sample.sharkfrankie.utils.BleDeviceListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class ScanDevicesActivity extends AppCompatActivity {
+public class ConnectDevice extends AppCompatActivity {
 
     private BluetoothAdapter mBluetoothAdapter;
     private static final int REQUEST_ENABLE_BT = 1;
 
-    private BleDeviceListAdapter bleDeviceListAdapter;
-
-    // stop scanning after 10 seconds
-    private static final long SCAN_PERIOD = 10000;
-
     private static final UUID SERVICE_UUID = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb");
     private static final UUID CHAR_UUID = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
-
-    private boolean mScanning;
-    private Handler mHandler;
     private BluetoothGatt mGatt;
 
     Button btnScanDevices;
-    Button nav_scanDevices;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,31 +57,20 @@ public class ScanDevicesActivity extends AppCompatActivity {
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
 
-        ArrayList<BluetoothDevice> availableBT = new ArrayList<>();
-        bleDeviceListAdapter = new BleDeviceListAdapter(this, availableBT);
-        final ListView listView_available = (ListView) findViewById(R.id.listView);
-
         btnScanDevices.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 BluetoothDevice device = mBluetoothAdapter.getRemoteDevice("E0:E5:CF:23:C4:E1");
                 connectToDevice(device);
+                if(mGatt == null) {
+                    Toast.makeText(ConnectDevice.this, "Device is not connected", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(ConnectDevice.this, "Device is connected", Toast.LENGTH_LONG).show();
+                }
+
             }
         });
     }
-
-    // Device scan callback.
-    private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
-        @Override
-        public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-
-                }
-            });
-        }
-    };
 
     private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
         @Override
@@ -109,18 +88,6 @@ public class ScanDevicesActivity extends AppCompatActivity {
                 default:
                     Log.e("gattCallback", "STATE_OTHER");
             }
-        }
-
-        @Override
-        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            List<BluetoothGattService> services = mGatt.getServices();
-            Log.i("onServicesDiscovered", services.toString());
-            gatt.readCharacteristic(services.get(0).getCharacteristics().get(0));
-        }
-
-        @Override
-        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            Log.i("onCharacteristicRead", characteristic.toString());
         }
     };
 
