@@ -5,13 +5,13 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -22,16 +22,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sample.sharkfrankie.R;
 import com.sample.sharkfrankie.utils.ConnectDevice;
 
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.util.UUID;
 
 import io.github.controlwear.virtual.joystick.android.JoystickView;
@@ -47,11 +43,12 @@ public class MainActivity extends AppCompatActivity
     private static final UUID SERVICE_UUID = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb");
     private static final UUID CHAR_UUID = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
 
-    private TextView mTextViewAngleRight;
-    private TextView mTextViewStrengthRight;
-
     private byte[] bytes = new byte[3];
     private byte middleMotor = 0, rightMotor = 0, leftMotor = 0;
+
+    ConnectDevice connectDevice = new ConnectDevice();
+
+    private Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,48 +79,54 @@ public class MainActivity extends AppCompatActivity
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
 
-        mTextViewAngleRight = (TextView) findViewById(R.id.textView_angle_right);
-        mTextViewStrengthRight = (TextView) findViewById(R.id.textView_strength_right);
-
-        JoystickView joystickRight = (JoystickView) findViewById(R.id.joystickView_right);
-        joystickRight.setOnMoveListener(new JoystickView.OnMoveListener() {
+        //joystick control
+        JoystickView joystick = (JoystickView) findViewById(R.id.joystickView);
+        joystick.setOnMoveListener(new JoystickView.OnMoveListener() {
             @Override
             public void onMove(int angle, int strength) {
-                mTextViewAngleRight.setText(angle + "°");
-                mTextViewStrengthRight.setText(strength + "%");
 
                 characteristic = mGatt.getService(SERVICE_UUID).getCharacteristic(CHAR_UUID);
 
                 if ((angle > 0 & angle <= 15) || angle > 345) {
                     rightMotor = prepareData("01", "1", "1111");
-                    leftMotor = prepareData("10", "0", "1111");
-                } else if (angle > 15 || angle > 45) {
-                    rightMotor = prepareData("01", "1", "0100");
-                    leftMotor = prepareData("10", "1", "0100");
-                } else if (angle > 45 || angle > 75) {
-
-                } else if (angle > 75 || angle > 105) {
-                    rightMotor = prepareData("01", "1", "1111");
                     leftMotor = prepareData("10", "1", "1111");
-                } else if (angle > 105 || angle > 135) {
-
-                } else if (angle > 135 || angle > 165) {
-
-                } else if (angle > 165 || angle > 195) {
-
-                } else if (angle > 195 || angle > 225) {
-
-                } else if (angle > 225 || angle > 255) {
-
-                } else if (angle > 255 || angle > 285) {
-
-                } else if (angle > 285 || angle > 315) {
-
-                } else if (angle > 315 || angle > 345) {
-
+                } else if (angle > 15 & angle <= 45) {
+                    rightMotor = prepareData("01", "1", "1111");
+                    leftMotor = prepareData("10", "1", "1010");
+                } else if (angle > 45 & angle <= 75) {
+                    rightMotor = prepareData("01", "1", "1111");
+                    leftMotor = prepareData("10", "1", "0101");
+                } else if (angle > 75 & angle <= 105) {
+                    rightMotor = prepareData("01", "1", "1111");
+                    leftMotor = prepareData("10", "0", "1111");
+                } else if (angle > 105 & angle <= 135) {
+                    rightMotor = prepareData("01", "0", "1111");
+                    leftMotor = prepareData("10", "0", "0101");
+                } else if (angle > 135 & angle <= 165) {
+                    rightMotor = prepareData("01", "0", "1111");
+                    leftMotor = prepareData("10", "0", "1010");
+                } else if (angle > 165 & angle <= 195) {
+                    rightMotor = prepareData("01", "0", "1111");
+                    leftMotor = prepareData("10", "0", "1111");
+                } else if (angle > 195 & angle <= 225) {
+                    rightMotor = prepareData("01", "0", "1010");
+                    leftMotor = prepareData("10", "0", "1111");
+                } else if (angle > 225 & angle <= 255) {
+                    rightMotor = prepareData("01", "0", "0101");
+                    leftMotor = prepareData("10", "0", "1111");
+                } else if (angle > 255 & angle <= 285) {
+                    rightMotor = prepareData("01", "0", "1111");
+                    leftMotor = prepareData("10", "1", "1111");
+                } else if (angle > 285 & angle <= 315) {
+                    rightMotor = prepareData("01", "1", "0101");
+                    leftMotor = prepareData("10", "1", "1111");
+                } else if (angle > 315 & angle <= 345) {
+                    rightMotor = prepareData("01", "1", "1010");
+                    leftMotor = prepareData("10", "1", "1111");
                 } else {
                     rightMotor = prepareData("01", "1", "0000");
                     leftMotor = prepareData("10", "1", "0000");
+                    middleMotor = prepareData("00", "1", "0000");
                 }
 
                 bytes[0] = middleMotor;
@@ -131,10 +134,53 @@ public class MainActivity extends AppCompatActivity
                 bytes[2] = leftMotor;
                 sendData(bytes);
             }
-        });
+        }, 500);
+    }
 
-        Button btnUp = (Button) findViewById(R.id.btnUp);
-        Button btnDown = (Button) findViewById(R.id.btnDown);
+    public void actionBtnUp(View view) {
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                characteristic = mGatt.getService(SERVICE_UUID).getCharacteristic(CHAR_UUID);
+
+                middleMotor = prepareData("00", "1", "1111");
+
+                bytes[0] = middleMotor;
+                sendData(bytes);
+            }
+        }, 500);
+    }
+
+    public void actionBtnDown(View view) {
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                characteristic = mGatt.getService(SERVICE_UUID).getCharacteristic(CHAR_UUID);
+
+                middleMotor = prepareData("00", "0", "1111");
+
+                bytes[0] = middleMotor;
+                sendData(bytes);
+            }
+        }, 500);
+    }
+
+    public void actionBtnStop(View view) {
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                characteristic = mGatt.getService(SERVICE_UUID).getCharacteristic(CHAR_UUID);
+
+                middleMotor = prepareData("00", "0", "0000");
+                rightMotor = prepareData("01", "0", "0000");
+                leftMotor = prepareData("10", "0", "0000");
+
+                bytes[0] = middleMotor;
+                bytes[1] = rightMotor;
+                bytes[2] = leftMotor;
+                sendData(bytes);
+            }
+        }, 500);
     }
 
     public byte prepareData(String motor, String direction, String speed) {
@@ -146,14 +192,6 @@ public class MainActivity extends AppCompatActivity
         data += speed;
 
         byte b = (byte) Integer.parseInt(data, 2);
-
-        /*
-        if(bytes == ) {
-            bytes = ByteBuffer.allocate(4).putInt(data).array();
-        }
-        */
-
-        System.out.println(b);
 
         return b;
     }
@@ -204,7 +242,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_scanDevices) {
+        if (id == R.id.nav_connect) {
             BluetoothDevice device = mBluetoothAdapter.getRemoteDevice("E0:E5:CF:23:C4:E1");
             connectToDevice(device);
 
@@ -216,7 +254,14 @@ public class MainActivity extends AppCompatActivity
 
 
         } else if (id == R.id.nav_disconnect) {
+            BluetoothDevice device = mBluetoothAdapter.getRemoteDevice("E0:E5:CF:23:C4:E2");
+            disconnectFromDevice(device);
 
+            if(mGatt == null) {
+                Toast.makeText(MainActivity.this, "Device is not connected", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(MainActivity.this, "Device is connected", Toast.LENGTH_LONG).show();
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -247,5 +292,9 @@ public class MainActivity extends AppCompatActivity
         if(mGatt == null) {
             mGatt = device.connectGatt(this, false, gattCallback);
         }
+    }
+
+    public void disconnectFromDevice(BluetoothDevice device) {
+        mGatt = null;
     }
 }

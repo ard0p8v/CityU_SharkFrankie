@@ -28,21 +28,18 @@ import java.util.UUID;
 
 public class ConnectDevice extends AppCompatActivity {
 
+    private BluetoothGatt mGatt;
     private BluetoothAdapter mBluetoothAdapter;
-    private static final int REQUEST_ENABLE_BT = 1;
+    private BluetoothGattCharacteristic characteristic;
 
+    private static final int REQUEST_ENABLE_BT = 1;
     private static final UUID SERVICE_UUID = UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb");
     private static final UUID CHAR_UUID = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");
-    private BluetoothGatt mGatt;
-
-    Button btnScanDevices;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_devices);
-
-        btnScanDevices = findViewById(R.id.btnScanDevices);
 
         if(!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, "BLE Not Supported", Toast.LENGTH_SHORT).show();
@@ -56,23 +53,9 @@ public class ConnectDevice extends AppCompatActivity {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
-
-        btnScanDevices.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                BluetoothDevice device = mBluetoothAdapter.getRemoteDevice("E0:E5:CF:23:C4:E1");
-                connectToDevice(device);
-                if(mGatt == null) {
-                    Toast.makeText(ConnectDevice.this, "Device is not connected", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(ConnectDevice.this, "Device is connected", Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });
     }
 
-    private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
+    public final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             Log.i("onConnectionStateChange", "Status:" + status);
@@ -91,12 +74,10 @@ public class ConnectDevice extends AppCompatActivity {
         }
     };
 
-    public void sendCommand() {
+    public void sendData(byte[] b) {
         if(mGatt != null) {
-            BluetoothGattService service = mGatt.getService(SERVICE_UUID);
-            BluetoothGattCharacteristic characteristic = service.getCharacteristic(CHAR_UUID);
-
-            characteristic.setValue("f".getBytes());
+            characteristic = mGatt.getService(SERVICE_UUID).getCharacteristic(CHAR_UUID);
+            characteristic.setValue(b);
             mGatt.writeCharacteristic(characteristic);
         }
     }
@@ -105,6 +86,10 @@ public class ConnectDevice extends AppCompatActivity {
         if(mGatt == null) {
             mGatt = device.connectGatt(this, false, gattCallback);
         }
+    }
+
+    public void disconnectFromDevice(BluetoothDevice device) {
+        mGatt = null;
     }
 
 

@@ -16,7 +16,7 @@
         android:layout_gravity="center"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="300dp"
+        android:layout_marginTop="328dp"
         android:text="Come on Frankie!"
         android:textColor="@color/frankie"
         android:textSize="33dp"
@@ -44,18 +44,15 @@
 
 
     <io.github.controlwear.virtual.joystick.android.JoystickView xmlns:custom="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/joystickView_right"
-        android:layout_width="280dp"
-        android:layout_height="280dp"
+        android:id="@+id/joystickView"
+        android:onClick="actionBtnJoystick"
+        android:layout_width="260dp"
+        android:layout_height="260dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         custom:JV_backgroundColor="#184366"
         custom:JV_borderColor="@color/frankie"
-        custom:JV_borderWidth="10dp"
+        custom:JV_borderWidth="8dp"
         custom:JV_buttonColor="@color/frankie"
         custom:layout_constraintBottom_toBottomOf="parent"
         custom:layout_constraintEnd_toEndOf="parent"
@@ -68,42 +65,49 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="77dp"
+        android:layout_marginEnd="80dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/up"
+        android:onClick="actionBtnUp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/joystickView_right"
-        app:layout_constraintVertical_bias="0.775" />
+        app:layout_constraintHorizontal_bias="0.994"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/joystickView"
+        app:layout_constraintVertical_bias="0.851" />
+
+    <Button
+        android:id="@+id/btnStop"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/stop"
+        android:onClick="actionBtnStop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.568" />
 
     <Button
         android:id="@+id/btnDown"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginStart="77dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="80dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/down"
+        android:onClick="actionBtnDown"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnUp"
+        app:layout_constraintHorizontal_bias="0.076"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/joystickView_right"
-        app:layout_constraintVertical_bias="0.775" />
-
-    <!--
-    <SeekBar
-        android:id="@+id/leftSeekBar"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:rotation="270"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.092"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-        -->
+        app:layout_constraintTop_toBottomOf="@+id/joystickView"
+        app:layout_constraintVertical_bias="0.851" />
 
 </android.support.constraint.ConstraintLayout>
